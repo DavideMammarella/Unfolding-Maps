@@ -9,10 +9,9 @@ import processing.core.PApplet;
 
 /**
  * HelloWorld
- *
  * An application with two maps side-by-side zoomed in on different locations.
- * Co-author: UC San Diego Coursera Intermediate Programming team
  *
+ * @author UC San Diego Intermediate Software Development MOOC team
  * @author Davide Mammarella
  *
  */
