@@ -3,7 +3,7 @@ package module1;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
-import de.fhpotsdam.unfolding.providers.Microsoft;
+import de.fhpotsdam.unfolding.providers.CartoDB;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import processing.core.PApplet;
 
@@ -47,7 +47,7 @@ public class HelloWorld extends PApplet {
         size(800, 600, P2D);
 
         // Set the background color for the Applet.
-        this.background(58, 61, 63);
+        this.background(66, 75, 84);
 
         // Select a map provider
 
@@ -62,10 +62,10 @@ public class HelloWorld extends PApplet {
          * Providers : http://unfoldingmaps.org/javadoc/de/fhpotsdam/unfolding/providers/package-summary.html
          * *************************************************************************************************************/
 
-        AbstractMapProvider provider = new Microsoft.RoadProvider();
+        AbstractMapProvider provider = new CartoDB.Positron();
 
         // Set a zoom level
-        int zoomLevel = 10;
+        int zoomLevel = 7;
 
         /*
         if (offline) {
