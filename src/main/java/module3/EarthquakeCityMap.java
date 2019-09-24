@@ -100,8 +100,10 @@ public class EarthquakeCityMap extends PApplet {
         if (mag < THRESHOLD_LIGHT) {
             color = color(95, 117, 142, 204);
             radius = 5;
+
+
         } else if (mag < THRESHOLD_MODERATE) {
-            color = color(219, 223, 172, 204);
+            color = color(230, 242, 92, 204);
             radius = 10;
         }
 
@@ -128,7 +130,7 @@ public class EarthquakeCityMap extends PApplet {
     }
 
     public void draw() {
-        background(66, 75, 84);
+        background(43,43,43);
         map.draw();
         addKey();
     }
@@ -138,13 +140,13 @@ public class EarthquakeCityMap extends PApplet {
     private void addKey()
     {
         // Key canvas
-        fill(color(250, 250, 248));
+        fill(color(250, 250, 240));
         float keyX = 65, keyY = 120;
         float keyWidth = 180, keyHeight = 250;
         rect(keyX, keyY, keyWidth, keyHeight);
 
         // Key title
-        fill(0, 102, 153, 204);
+        fill(0);
         textSize(16);
         text("Earthquake Key", 85, 160);
 

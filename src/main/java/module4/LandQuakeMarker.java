@@ -32,8 +32,15 @@ public class LandQuakeMarker extends EarthquakeMarker {
 		
 		// HINT: Notice the radius variable in the EarthquakeMarker class
 		// and how it is set in the EarthquakeMarker constructor
-		
-		// TODO: Implement this method
+
+		// DONE: Implement this method
+		int radius = 13;
+		if (getDepth() < THRESHOLD_INTERMEDIATE) {
+			radius = 5;
+		} else if (getDepth() < THRESHOLD_DEEP) {
+			radius = 10;
+		}
+		pg.ellipse(x, y, radius, radius);
 		
 	}
 	
