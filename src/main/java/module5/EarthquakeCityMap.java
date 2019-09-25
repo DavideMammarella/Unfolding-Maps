@@ -8,7 +8,7 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.AbstractShapeMarker;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.MultiMarker;
-import de.fhpotsdam.unfolding.providers.Google;
+import de.fhpotsdam.unfolding.providers.CartoDB;
 import de.fhpotsdam.unfolding.providers.MBTilesMapProvider;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import parsing.ParseFeed;
@@ -64,7 +64,8 @@ public class EarthquakeCityMap extends PApplet {
 	private CommonMarker lastSelected;
 	private CommonMarker lastClicked;
 	
-	public void setup() {		
+	public void setup() {
+
 		// (1) Initializing canvas and map tiles
 		size(900, 700, OPENGL);
 		if (offline) {
@@ -72,7 +73,7 @@ public class EarthquakeCityMap extends PApplet {
 		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 200, 50, 650, 600, new CartoDB.Positron());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 		    //earthquakesURL = "2.5_week.atom";
 		}
@@ -119,7 +120,7 @@ public class EarthquakeCityMap extends PApplet {
 	
 	
 	public void draw() {
-		background(0);
+		background(43,43,43);
 		map.draw();
 		addKey();
 		
@@ -147,7 +148,15 @@ public class EarthquakeCityMap extends PApplet {
 	// 
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
-		// TODO: Implement this method
+		if (lastSelected == null) {
+			for (Marker marker: markers) {
+				if (! marker.isSelected() && marker.isInside(map, mouseX, mouseY)) {
+					lastSelected = (CommonMarker) marker;
+					marker.setSelected(true);
+					break;
+				}
+			}
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -158,11 +167,82 @@ public class EarthquakeCityMap extends PApplet {
 	@Override
 	public void mouseClicked()
 	{
-		// TODO: Implement this method
-		// Hint: You probably want a helper method or two to keep this code
-		// from getting too long/disorganized
+		// DONE: Implement this method
+		if(lastClicked != null) {
+			if(lastSelected != null) {
+				lastSelected.setSelected(false);
+				lastSelected=null;
+			}
+			lastClicked.setClicked(false);
+			lastClicked = null;
+			unhideMarkers();
+		} else {
+			checkClickedMarkers(quakeMarkers);
+			checkClickedMarkers(cityMarkers);
+			if(lastClicked instanceof EarthquakeMarker) {
+				hideCityMarkers(cityMarkers);
+				hideOtherMarkers(quakeMarkers);
+			} else if(lastClicked instanceof CityMarker) {
+				hideQuakeMarkers(quakeMarkers);
+				hideOtherMarkers(cityMarkers);
+			}
+		}
+
 	}
-	
+
+	// Hide earthquake markers if threat circle doesn't cover earthquake markers
+	private void hideQuakeMarkers(List<Marker> earthquakes) {
+		for(Marker earthquake : earthquakes) {
+			if(isCovered(earthquake, (CityMarker) lastClicked)){
+				earthquake.setHidden(false);
+			} else {
+				earthquake.setHidden(true);
+			}
+		}
+	}
+
+	// Determine if an earthquake cover earthquake markers
+	private boolean isCovered(Marker earthquake, CityMarker lastClicked){
+		return earthquake.getDistanceTo(lastClicked.getLocation()) < ((EarthquakeMarker) earthquake).threatCircle();
+	}
+
+	// Hide city markers if threat circle doesn't cover city markers
+	private void hideCityMarkers(List<Marker> cities) {
+		for(Marker city : cities) {
+			if(isThreatened(city,(EarthquakeMarker) lastClicked)) {
+				city.setHidden(false);
+			} else {
+				city.setHidden(true);
+			}
+		}
+	}
+
+	// Determine if a city is threatened by an earthquake
+	private boolean isThreatened(Marker city, EarthquakeMarker lastClickedThreat){
+		return city.getDistanceTo(lastClickedThreat.getLocation()) < lastClickedThreat.threatCircle();
+	}
+
+	// Hide markers except the one that has been clicked
+	private void hideOtherMarkers(List<Marker> markers) {
+		for(Marker marker : markers) {
+			if(marker != lastClicked) {
+				marker.setHidden(true);
+			}
+		}
+	}
+
+	// Checks if a marker has been clicked
+	private void checkClickedMarkers(List<Marker> markers) {
+		if(lastClicked == null) {
+			for (Marker marker : markers) {
+				if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
+					lastClicked = (CommonMarker) marker;
+					lastClicked.setClicked(true);
+					break;
+				}
+			}
+		}
+	}
 	
 	// loop over and unhide all markers
 	private void unhideMarkers() {
